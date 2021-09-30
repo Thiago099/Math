@@ -1,7 +1,7 @@
 def parse(input):
     #char
     def parse_char(m):
-        return ' ' if m < '"' else '#' if m < '0' else '0' if m < ':' else '#' if m < 'A' else 'A' if m < '[' else '#' if m < 'a' else 'a' if m < '{' else '#'
+        return ' ' if m < '"' else '#' if m < '0' else '0' if m < ':' else '#' if m < 'A' else 'A' if m < '[' else '#' if m < 'a' else 'A' if m < '{' else '#'
     parsed_input = []
     current = input[0]
     current_type = parse_char(input[0])
@@ -23,7 +23,10 @@ def parse(input):
         if(len(current) == 1):
             result.append(current[0])
         else:
-            result.append(['T', current])
+            pos = ''
+            for k in current:
+                pos += k[1]
+            result.append(['A', pos])
         current = []
     
     def word():
@@ -77,7 +80,6 @@ def parse(input):
         get_number()
     obj = {
         'A': word,
-        'a': word,
         '#': symbol,
         '0': number
     }
