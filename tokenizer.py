@@ -1,3 +1,38 @@
+import math as mt
+functions = {
+    'sin'       : mt.sin,
+    'sind'      : lambda a: mt.sin(mt.radians(a)),
+    'cos'       : mt.cos,
+    'cosd'      : lambda a: mt.cos(mt.radians(a)),
+    'tan'       : mt.tan,
+    'tand'      : lambda a: mt.tan(mt.radians(a)),
+    'acos'      : mt.acos,
+    'acosd'     : lambda a: mt.acos(mt.radians(a)),
+    'acos'      : mt.acos,
+    'acosd'     : lambda a: mt.acos(mt.radians(a)),
+    'asin'      : mt.asin,
+    'asind'     : lambda a: mt.asin(mt.radians(a)),
+    'atan'      : mt.atan,
+    'atand'     : lambda a: mt.atan(mt.radians(a)),
+}
+parentesis = {
+    '(':')',
+    '[':']',
+    '{':'}',
+    '\'':'\'',
+    '"':'"'
+}
+class token:
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
+    def __repr__(self):
+        if(self.type in parentesis.keys()):
+            cur = ''
+            for i in self.value:
+                cur +=  i.__repr__()
+            return self.type + cur + parentesis[self.type]
+        return str(self.value)
 def parse(input):
     #char
     def parse_char(m):
@@ -21,12 +56,12 @@ def parse(input):
     def get_text():
         nonlocal current, result
         if(len(current) == 1):
-            result.append(current[0])
+            result.append(['F' if current[0][1] in functions.keys() else 'A', current[0][1]])
         else:
             pos = ''
             for k in current:
                 pos += k[1]
-            result.append(['A', pos])
+            result.append(['F' if pos in functions.keys() else 'A', pos])
         current = []
     
     def word():
@@ -112,14 +147,14 @@ def parse(input):
                 if(len(data) == 0):
                     label = label + exp
                     if(len(ctx) == 0):
-                        result.append([label])
+                        result.append(token(label, ''))
                     else:
-                        ctx[-1].append([label])
+                        ctx[-1].append(token(label, ''))
                     continue
                 if(len(ctx) == 0):
-                    result.append([label, data])
+                    result.append(token(label, data))
                 else:
-                    ctx[-1].append([label, data])
+                    ctx[-1].append(token(label, data))
                 continue
             elif(i[1] in ['(', '[', '{', '\'' ,'"']):
                 ci = complement[i[1]]
@@ -129,7 +164,43 @@ def parse(input):
                 continue
             
         if(len(ctx) == 0):
-            result.append(i)
+            result.append(token(i[0], i[1]))
         else:
-            ctx[-1].append(i)
+            ctx[-1].append(token(i[0], i[1]))
     return result
+
+
+def parse_group(input):
+    expression = {}
+    value = {}
+    def split(input):
+        result = []
+        current = []
+        for i in input:
+            if(i.type == '#' and i.value == '='):
+                result.append(current)
+                current = []
+            else:
+                current.append(i)
+        result.append(current)
+        return result
+    for i in input:
+        ii = split(i)
+        def single(a, b):
+            if ii[b][0].type == 'A':
+                pos = ii[b][0].value
+                if len(ii[a]) == 1:
+                    if(ii[a][0].type == 'A'):
+                        value[ii[a][0].value] = ii[b][0] 
+                    value[pos] = ii[a][0]
+                else:
+                    try:
+                        expression[pos].append(ii[a])
+                    except:
+                        expression[pos] = [ii[a]]
+            
+        if len(ii[0]) == 1:
+            single(1, 0)
+        elif len(ii[1]) == 1:
+            single(0, 1)
+    return expression, value
