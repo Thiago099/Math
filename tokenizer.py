@@ -32,6 +32,8 @@ class token:
             for i in self.value:
                 cur +=  i.__repr__()
             return self.type + cur + parentesis[self.type]
+        if(self.type == 'X'):
+            return str(self.variable) + '^' + str(self.power)
         return str(self.value)
 def parse(input):
     #char
