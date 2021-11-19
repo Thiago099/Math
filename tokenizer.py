@@ -35,6 +35,14 @@ class token:
         if(self.type == 'X'):
             return str(self.variable) + '^' + str(self.power)
         return str(self.value)
+    def __eq__(self, other):
+        if(self.type != other.type):
+            return False
+        if(self.type == 'X'):
+            return self.variable == other.variable and self.power == other.power
+        return self.value == other.value
+    def __ne__(self, other):
+        return not self.__eq__(other)
 def parse(input):
     #char
     def parse_char(m):
